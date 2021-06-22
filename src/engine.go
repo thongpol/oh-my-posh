@@ -25,6 +25,21 @@ func (e *engine) string() string {
 	return e.console.String()
 }
 
+func (e *engine) canWriteRPrompt() bool {
+	prompt := e.string()
+	consoleWidth, err := e.env.getTerminalWidth()
+	if err != nil || consoleWidth == 0 {
+		return true
+	}
+	promptWidth := e.ansi.lenWithoutANSI(prompt)
+	availableSpace := consoleWidth - promptWidth
+	if promptWidth > consoleWidth {
+		availableSpace = promptWidth - (promptWidth % consoleWidth)
+	}
+	promptBreathingRoom := 30
+	return (availableSpace - e.ansi.lenWithoutANSI(e.rprompt)) >= promptBreathingRoom
+}
+
 func (e *engine) render() string {
 	for _, block := range e.config.Blocks {
 		e.renderBlock(block)
@@ -151,7 +166,7 @@ func (e *engine) print() string {
 		prompt += fmt.Sprintf("\nRPROMPT=\"%s\"", e.rprompt)
 		return prompt
 	case pwsh, powershell5, bash, plain:
-		if e.rprompt == "" {
+		if e.rprompt == "" || !e.canWriteRPrompt() {
 			break
 		}
 		e.write(e.ansi.saveCursorPosition)
@@ -161,4 +176,44 @@ func (e *engine) print() string {
 		e.write(e.ansi.restoreCursorPosition)
 	}
 	return e.string()
+}
+
+func (e *engine) renderTooltip(tip string) string {
+	tip = strings.Trim(tip, " ")
+	var tooltip *Segment
+	for _, tp := range e.config.Tooltips {
+		if !tp.shouldInvokeWithTip(tip) {
+			continue
+		}
+		tooltip = tp
+	}
+	if tooltip == nil {
+		return ""
+	}
+	if err := tooltip.mapSegmentWithWriter(e.env); err != nil {
+		return ""
+	}
+	if !tooltip.enabled() {
+		return ""
+	}
+	tooltip.stringValue = tooltip.string()
+	// little hack to reuse the current logic
+	block := &Block{
+		Alignment: Right,
+		Segments:  []*Segment{tooltip},
+	}
+	switch e.env.getShellName() {
+	case zsh:
+		block.init(e.env, e.colorWriter, e.ansi)
+		return block.renderSegments()
+	case pwsh, powershell5:
+		block.initPlain(e.env, e.config)
+		tooltipText := block.renderSegments()
+		e.write(e.ansi.clearEOL)
+		e.write(e.ansi.carriageForward())
+		e.write(e.ansi.getCursorForRightWrite(tooltipText, 0))
+		e.write(tooltipText)
+		return e.string()
+	}
+	return ""
 }

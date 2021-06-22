@@ -27,7 +27,7 @@ var bashInit string
 var zshInit string
 
 const (
-	noExe       = "echo \"Unable to find Oh my Posh executable\""
+	noExe       = "echo \"Unable to find Oh My Posh executable\""
 	zsh         = "zsh"
 	bash        = "bash"
 	pwsh        = "pwsh"
@@ -57,6 +57,7 @@ type args struct {
 	CursorPadding *int
 	RPromptOffset *int
 	StackCount    *int
+	ToolTip       *string
 }
 
 func main() {
@@ -141,6 +142,10 @@ func main() {
 			"stack-count",
 			0,
 			"The current location stack count"),
+		ToolTip: flag.String(
+			"tooltip",
+			"",
+			"Render a tooltip based on the string value"),
 	}
 	flag.Parse()
 	env := &environment{}
@@ -191,9 +196,12 @@ func main() {
 		consoleTitle: title,
 		ansi:         ansi,
 	}
-
 	if *args.Debug {
 		fmt.Print(engine.debug())
+		return
+	}
+	if len(*args.ToolTip) != 0 {
+		fmt.Print(engine.renderTooltip(*args.ToolTip))
 		return
 	}
 	prompt := engine.render()
@@ -276,6 +284,7 @@ func getConsoleBackgroundColor(env environmentInfo, backgroundColorTemplate stri
 	template := &textTemplate{
 		Template: backgroundColorTemplate,
 		Context:  context,
+		Env:      env,
 	}
 	text, err := template.render()
 	if err != nil {

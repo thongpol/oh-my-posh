@@ -5,6 +5,7 @@ import (
 
 	"github.com/distatus/battery"
 	"github.com/gookit/config/v2"
+	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -140,6 +141,11 @@ func (env *MockedEnvironment) stackCount() int {
 
 func (env *MockedEnvironment) isWsl() bool {
 	return false
+}
+
+func (env *MockedEnvironment) getTerminalWidth() (int, error) {
+	args := env.Called(nil)
+	return args.Int(0), args.Error(1)
 }
 
 const (
@@ -604,7 +610,9 @@ func TestParseMappedLocations(t *testing.T) {
 	for _, tc := range cases {
 		config.ClearAll()
 		config.WithOptions(func(opt *config.Options) {
-			opt.TagName = "config"
+			opt.DecoderConfig = &mapstructure.DecoderConfig{
+				TagName: "config",
+			}
 		})
 		err := config.LoadStrings(config.JSON, tc.JSON)
 		assert.NoError(t, err)

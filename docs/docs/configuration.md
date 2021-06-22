@@ -4,7 +4,7 @@ title: Configuration
 sidebar_label: ⚙️ Configuration
 ---
 
-Oh my Posh renders your prompt based on the definition of _blocks_ (like Lego) which contain one or more _segments_.
+Oh My Posh renders your prompt based on the definition of _blocks_ (like Lego) which contain one or more _segments_.
 A really simple configuration could look like this.
 
 ```json
@@ -33,13 +33,13 @@ A really simple configuration could look like this.
 ```
 
 With this configuration, a single powerline segment is rendered that shows the name of the folder you're currently in.
-To set this configuration in combination with a Oh my Posh [executable][releases], use the `--config` flag to
+To set this configuration in combination with a Oh My Posh [executable][releases], use the `--config` flag to
 set a path to a json file containing the above code. The `--shell universal` flag is used to print the prompt without
 escape characters to see the prompt as it would be shown inside a prompt function for your shell.
 
 :::info
 The command below will not persist the configuration for your shell but print the prompt in your terminal.
-If you want to use your own configuration permanently, adjust the [prompt configuration][promptconfig] to use your custom
+If you want to use your own configuration permanently, adjust the prompt configuration to use your custom
 theme.
 :::
 
@@ -48,7 +48,7 @@ oh-my-posh --config sample.json --shell universal
 ```
 
 If all goes according to plan, you should see the prompt being printed out on the line below. In case you see a lot of
-boxes with question marks, [set up your terminal][setupterm] to use a supported font before continuing.
+boxes with question marks, set up your terminal to use a supported font before continuing.
 
 ## General Settings
 
@@ -345,7 +345,7 @@ To change *only* the background color, just omit the first color from the above 
 "prefix": "<,#FFFFFF>┏[</>",
 ```
 
-Oh my Posh mainly supports three different color types being
+Oh My Posh mainly supports three different color types being
 
 - Typical [hex colors][hexcolors] (for example `#CB4B16`).
 - The `transparent` keyword which can be used to create either a transparent foreground override
@@ -464,8 +464,6 @@ has to be enabled at the segment level. Hyperlink generation is disabled by defa
 }
 ```
 
-[promptconfig]: /docs/installation#4-replace-your-existing-prompt
-[setupterm]: /docs/installation#1-setup-your-terminal
 [releases]: https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest
 [nf]: https://www.nerdfonts.com/
 [segments]: /docs/battery

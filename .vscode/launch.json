@@ -7,7 +7,15 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceRoot}/src",
-      "args": ["--config=${workspaceRoot}/themes/jandedobbeleer.omp.json"]
+      "args": ["--config=${workspaceRoot}/themes/jandedobbeleer.omp.json", "--shell=pwsh"]
+    },
+    {
+      "name": "Launch Tooltip",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceRoot}/src",
+      "args": ["--config=/Users/jan/.jandedobbeleer.omp.json", "--tooltip=git"]
     },
     {
       "name": "Launch tests",

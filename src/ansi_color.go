@@ -70,7 +70,10 @@ func (a *AnsiColor) getAnsiFromColorString(colorString string, isBackground bool
 		return colorFromName
 	}
 	style := color.HEX(colorString, isBackground)
-	return style.Code()
+	if style.IsEmpty() {
+		return ""
+	}
+	return style.String()
 }
 
 func (a *AnsiColor) writeColoredText(background, foreground, text string) {
@@ -108,7 +111,13 @@ func (a *AnsiColor) writeAndRemoveText(background, foreground, text, textToRemov
 }
 
 func (a *AnsiColor) write(background, foreground, text string) {
+	if len(text) == 0 {
+		return
+	}
+	text = a.ansi.escapeText(text)
 	text = a.ansi.formatText(text)
+	text = a.ansi.generateHyperlink(text)
+
 	// first we match for any potentially valid colors enclosed in <>
 	match := findAllNamedRegexMatch(`<(?P<foreground>[^,>]+)?,?(?P<background>[^>]+)?>(?P<content>[^<]*)<\/>`, text)
 	for i := range match {

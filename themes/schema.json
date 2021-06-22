@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "http://example.com/example.json",
   "type": "object",
-  "title": "The Oh my Posh theme definition",
+  "title": "The Oh My Posh theme definition",
   "description": "https://ohmyposh.dev/docs/configure",
   "definitions": {
     "color": {
@@ -1169,44 +1169,29 @@
                     "default": "folder"
                   },
                   "mapped_locations": {
-                    "type": "array",
+                    "type": "object",
                     "title": "Mapped Locations",
                     "description": "Custom glyph/text for specific paths",
-                    "items": {
-                      "type": "array",
-                      "items": [
-                        {
-                          "type": "string",
-                          "title": "Filesystem path"
-                        },
-                        {
-                          "type": "string",
-                          "title": "Replacement text"
-                        }
-                      ],
-                      "minItems": 2,
-                      "maxItems": 2,
-                      "additionalItems": false
-                    }
-                  },
-                  "mapped_locations_enabled": {
-                    "type": "boolean",
-                    "title": "Enable the Mapped Locations feature",
-                    "description": "Replace known locations in the path with the replacements before applying the style.",
-                    "default": true
-                  },
-                  "enable_hyperlink": {
-                    "type": "boolean",
-                    "title": "Enable hyperlink",
-                    "description": "Displays an hyperlink for the current path",
-                    "default": false
-                  },
-                  "stack_count_enabled": {
-                    "type": "boolean",
-                    "title": "Show/hide stack count",
-                    "description": "Displays the stack count when using pushd/popd",
-                    "default": false
+                    "default": {}
                   }
+                },
+                "mapped_locations_enabled": {
+                  "type": "boolean",
+                  "title": "Enable the Mapped Locations feature",
+                  "description": "Replace known locations in the path with the replacements before applying the style.",
+                  "default": true
+                },
+                "enable_hyperlink": {
+                  "type": "boolean",
+                  "title": "Enable hyperlink",
+                  "description": "Displays an hyperlink for the current path",
+                  "default": false
+                },
+                "stack_count_enabled": {
+                  "type": "boolean",
+                  "title": "Show/hide stack count",
+                  "description": "Displays the stack count when using pushd/popd",
+                  "default": false
                 }
               }
             }
@@ -1585,6 +1570,25 @@
       "default": [],
       "description": "https://ohmyposh.dev/docs/configure",
       "items": { "$ref": "#/definitions/block" }
+    },
+    "tooltips": {
+      "type": "array",
+      "title": "Tooltip list, prompt elements to display based on context",
+      "description": "https://ohmyposh.dev/docs/beta#tooltips",
+      "default": [],
+      "items": {
+        "allOf": [{ "$ref": "#/definitions/segment" }],
+        "properties": {
+          "tips": {
+            "type": "array",
+            "title": "The commands for which you want the segment to show",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["tips"]
+      }
     }
   }
 }

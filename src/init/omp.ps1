@@ -23,6 +23,7 @@ Set-DefaultEnvValue("POSH_GIT_ENABLED")
 
 $global:PoshSettings = New-Object -TypeName PSObject -Property @{
     Theme = "";
+    EnableToolTips = $false;
 }
 
 # used to detect empty hit
@@ -55,6 +56,24 @@ function global:Initialize-ModuleSupport {
             }
         }
         catch {}
+    }
+
+    # Set the keyhandler to enable tooltips
+    if ($global:PoshSettings.EnableToolTips -eq $true) {
+        Set-PSReadlineKeyHandler -Key SpaceBar -ScriptBlock {
+            [Microsoft.PowerShell.PSConsoleReadLine]::Insert(' ')
+            $position = $host.UI.RawUI.CursorPosition
+            $omp = "::OMP::"
+            $config = $global:PoshSettings.Theme
+            $cleanPWD = $PWD.ProviderPath.TrimEnd("\")
+            $cleanPSWD = $PWD.ToString().TrimEnd("\")
+            $tooltip = $null
+            $cursor = $null
+            [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$tooltip, [ref]$cursor)
+            $standardOut = @(&$omp --pwd="$cleanPWD" --pswd="$cleanPSWD" --config="$config" --tooltip="$tooltip" 2>&1)
+            Write-Host $standardOut -NoNewline
+            $host.UI.RawUI.CursorPosition = $position
+        }
     }
 }
 
@@ -148,12 +167,10 @@ function global:Export-PoshTheme {
     $config = $global:PoshSettings.Theme
     $omp = "::OMP::"
     $configString = @(&$omp --config="$config" --config-format="$Format" --print-config 2>&1)
-
     # if no path, copy to clipboard by default
     if ($FilePath -ne "") {
-        if ($FilePath.StartsWith('~')) {
-            $FilePath = $FilePath.Replace('~', $HOME)
-        }
+        #https://stackoverflow.com/questions/3038337/powershell-resolve-path-that-might-not-exist
+        $FilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePath)
         [IO.File]::WriteAllLines($FilePath, $configString)
     }
     else {

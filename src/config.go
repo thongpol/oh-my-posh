@@ -15,6 +15,7 @@ import (
 	"github.com/gookit/config/v2/json"
 	"github.com/gookit/config/v2/toml"
 	"github.com/gookit/config/v2/yaml"
+	"github.com/mitchellh/mapstructure"
 )
 
 // Config holds all the theme for rendering the prompt
@@ -26,6 +27,7 @@ type Config struct {
 	ConsoleTitleTemplate string            `config:"console_title_template"`
 	TerminalBackground   string            `config:"terminal_background"`
 	Blocks               []*Block          `config:"blocks"`
+	Tooltips             []*Segment        `config:"tooltips"`
 }
 
 const (
@@ -61,7 +63,9 @@ func loadConfig(env environmentInfo) (*Config, error) {
 	config.AddDriver(json.Driver)
 	config.AddDriver(toml.Driver)
 	config.WithOptions(func(opt *config.Options) {
-		opt.TagName = "config"
+		opt.DecoderConfig = &mapstructure.DecoderConfig{
+			TagName: "config",
+		}
 	})
 
 	err := config.LoadFiles(configFile)

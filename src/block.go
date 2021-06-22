@@ -167,7 +167,6 @@ func (b *Block) renderDiamondSegment(text string) {
 }
 
 func (b *Block) renderText(text string) {
-	text = b.ansi.generateHyperlink(text)
 	defaultValue := " "
 	prefix := b.activeSegment.getValue(Prefix, defaultValue)
 	postfix := b.activeSegment.getValue(Postfix, defaultValue)

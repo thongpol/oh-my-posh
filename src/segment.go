@@ -9,6 +9,7 @@ import (
 // Segment represent a single segment and it's configuration
 type Segment struct {
 	Type                SegmentType              `config:"type"`
+	Tips                []string                 `config:"tips"`
 	Style               SegmentStyle             `config:"style"`
 	PowerlineSymbol     string                   `config:"powerline_symbol"`
 	InvertPowerline     bool                     `config:"invert_powerline"`
@@ -23,6 +24,7 @@ type Segment struct {
 	writer              SegmentWriter
 	stringValue         string
 	active              bool
+	env                 environmentInfo
 }
 
 // SegmentTiming holds the timing context for a segment
@@ -115,6 +117,8 @@ const (
 	Crystal SegmentType = "crystal"
 	// Dart writes the active dart version
 	Dart SegmentType = "dart"
+	// Nbgv writes the nbgv version information
+	Nbgv SegmentType = "nbgv"
 )
 
 func (segment *Segment) string() string {
@@ -182,6 +186,7 @@ func (segment *Segment) getColor(templates []string, defaultColor string) string
 	}
 	txtTemplate := &textTemplate{
 		Context: segment.writer,
+		Env:     segment.env,
 	}
 	for _, template := range templates {
 		txtTemplate.Template = template
@@ -192,6 +197,15 @@ func (segment *Segment) getColor(templates []string, defaultColor string) string
 		return value
 	}
 	return defaultColor
+}
+
+func (segment *Segment) shouldInvokeWithTip(tip string) bool {
+	for _, t := range segment.Tips {
+		if t == tip {
+			return true
+		}
+	}
+	return false
 }
 
 func (segment *Segment) foreground() string {
@@ -211,6 +225,7 @@ func (segment *Segment) background() string {
 }
 
 func (segment *Segment) mapSegmentWithWriter(env environmentInfo) error {
+	segment.env = env
 	functions := map[SegmentType]SegmentWriter{
 		Session:       &session{},
 		Path:          &path{},
@@ -242,6 +257,7 @@ func (segment *Segment) mapSegmentWithWriter(env environmentInfo) error {
 		AZFunc:        &azfunc{},
 		Crystal:       &crystal{},
 		Dart:          &dart{},
+		Nbgv:          &nbgv{},
 	}
 	if writer, ok := functions[segment.Type]; ok {
 		props := &properties{
