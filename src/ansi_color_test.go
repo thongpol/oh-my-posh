@@ -12,6 +12,7 @@ const (
 )
 
 func TestWriteAndRemoveText(t *testing.T) {
+	ansiUtils := 
 	ansi := &ansiUtils{}
 	ansi.init("pwsh")
 	renderer := &AnsiColor{

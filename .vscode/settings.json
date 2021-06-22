@@ -1,3 +1,5 @@
 {
-  "go.lintTool": "golangci-lint"
+  "go.lintTool": "golangci-lint",
+  "svn.ignoreMissingSvnWarning": true,
+  "git.ignoreLimitWarning": true
 }
